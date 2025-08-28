@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Certificados - Red Innovations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fira Code', 'JetBrains Mono', 'Ubuntu Mono', 'DejaVu Sans Mono', monospace;
+        }
+        
+        body {
+            background-color: #0b0f14;
+            color: #e5e7eb;
+            line-height: 1.6;
+            padding: 20px;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #1f2937;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+        
+        .logo svg {
+            margin-right: 10px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+        
+        nav ul li a:hover, 
+        nav ul li a.active {
+            color: #00ff88;
+        }
+        
+        .terminal-window {
+            background-color: #0e141a;
+            border-radius: 14px;
+            border: 2px solid #1f2937;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        
+        .terminal-header {
+            background-color: #111827;
+            padding: 12px 20px;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            margin-right: 15px;
+        }
+        
+        .terminal-button {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .button-close {
+            background-color: #ff5f56;
+        }
+        
+        .button-minimize {
+            background-color: #ffbd2e;
+        }
+        
+        .button-maximize {
+            background-color: #27c93f;
+        }
+        
+        .terminal-title {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+        
+        .terminal-body {
+            padding: 30px;
+        }
+        
+        .command-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .prompt {
+            color: #94a3b8;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        
+        .prompt-user {
+            color: #94a3b8;
+        }
+        
+        .prompt-at {
+            color: #e5e7eb;
+        }
+        
+        .prompt-host {
+            color: #94a3b8;
+        }
+        
+        .prompt-dir {
+            color: #e5e7eb;
+        }
+        
+        .prompt-symbol {
+            color: #00ff88;
+        }
+        
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            color: #e5e7eb;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            width: 100%;
+            outline: none;
+            caret-color: #00ff88;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+        
+        button {
+            background-color: #00ff88;
+            color: #0b0f14;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        
+        button:hover {
+            background-color: #00cc6a;
+        }
+        
+        button.secondary {
+            background-color: #4fd1c5;
+        }
+        
+        button.secondary:hover {
+            background-color: #38b2ac;
+        }
+        
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #0b1220;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
+        }
+        
+        .certificate-info {
+            display: none;
+        }
+        
+        .certificate-info.valid {
+            display: block;
+            color: #00ff88;
+        }
+        
+        .certificate-info.invalid {
+            display: block;
+            color: #ff5f56;
+        }
+        
+        .cert-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+        }
+        
+        .cert-details p {
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+        
+        .cert-details span {
+            color: #e5e7eb;
+        }
+        
+        .success-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .hash-code {
+            font-family: monospace;
+            background-color: #1a202c;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: #00ff88;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .download-info {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #111827;
+            border-radius: 8px;
+            border-left: 4px solid #00ff88;
+        }
+        
+        .download-info h4 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .download-steps {
+            list-style-type: none;
+        }
+        
+        .download-steps li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .download-steps li::before {
+            content: "→";
+            color: #00ff88;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: auto;
+            padding: 30px 0;
+            border-top: 1px solid #1f2937;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .contact-info {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff88;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            nav ul li {
+                margin: 5px 10px;
+            }
+            
+            .terminal-body {
+                padding: 15px;
+            }
+            
+            .command-input {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            input[type="text"] {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+                margin-top: 10px;
+                margin-left: 0;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo" onclick="window.location.href='/'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Red Innovations
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/cursos">Cursos</a></li>
+                    <li><a href="/verificar" class="active">Verificação</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <div class="terminal-button button-close"></div>
+                    <div class="terminal-button button-minimize"></div>
+                    <div class="terminal-button button-maximize"></div>
+                </div>
+                <div class="terminal-title">user@linux: ~/verificar-certificado</div>
+            </div>
+            
+            <div class="terminal-body">
+                <div class="command-input">
+                    <div class="prompt">
+                        <span class="prompt-user">user@linux</span><span class="prompt-at">@</span><span class="prompt-host">host</span><span class="prompt-dir">:~/verificar-certificado</span><span class="prompt-symbol">$</span>
+                    </div>
+                    <input type="text" id="certificateId" placeholder=" Digite o ID do certificado" autofocus>
+                    <button onclick="verificarCertificado()">Verificar</button>
+                </div>
+                
+                <div id="resultado" class="result-area">
+                    <div id="placeholderText">
+                        <span class="prompt-symbol">[INFO]</span> Digite o ID do certificado e clique em Verificar.
+                        <div style="margin-top: 10px; color: #94a3b8;">
+                            <span class="prompt-symbol">[EXEMPLO]</span> IDs válidos: LINUX2025-001 a LINUX2025-010
+                        </div>
+                    </div>
+                    <div id="certificateResult" class="certificate-info">
+                        <div id="resultIcon" class="success-icon"></div>
+                        <div id="resultText"></div>
+                        <div id="certDetails" class="cert-details"></div>
+                        <div id="actionButtons" class="action-buttons"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <div class="prompt">
+                        <span class="prompt-user">user@linux</span><span class="prompt-at">@</span><span class="prompt-host">host</span><span class="prompt-dir">:~/verificar-certificado</span><span class="prompt-symbol">$</span>
+                    </div>
+                    <div style="color: #94a3b8; margin-top: 5px;">
+                        <span class="prompt-symbol">[DICA]</span> Após verificação, você poderá baixar o certificado em PDF
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="download-info">
+            <h4>Como baixar seu certificado:</h4>
+            <ol class="download-steps">
+                <li>Digite o ID do seu certificado no campo acima (ex: LINUX2025-001)</li>
+                <li>Clique em "Verificar" para validar seu certificado</li>
+                <li>Após a verificação, aparecerá um botão "Baixar PDF"</li>
+                <li>Clique em "Baixar PDF" para salvar o certificado em seu computador</li>
+            </ol>
+        </div>
+        
+        <footer>
+            <p>Red Innovations © 2025 - Sistema de Verificação de Certificados</p>
+            <p>Curso de Linux - 20 horas - Modalidade Online - Instrutor: José Moraes</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>contato@redinnovations.com</span>
+                </div>
+                <div class="contact-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    <span>(11) 99999-9999</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // URL base da API
+        const API_BASE = 'http://localhost:3001/api';
+        
+        // Verificar certificado
+        async function verificarCertificado() {
+            const certId = document.getElementById('certificateId').value.trim().toUpperCase();
+            const resultado = document.getElementById('certificateResult');
+            const resultadoTexto = document.getElementById('resultText');
+            const resultadoIcon = document.getElementById('resultIcon');
+            const detalhesCert = document.getElementById('certDetails');
+            const botoesAcao = document.getElementById('actionButtons');
+            const placeholder = document.getElementById('placeholderText');
+            
+            placeholder.style.display = 'none';
+            
+            if (!certId) {
+                mostrarResultado('error', 'Por favor, digite um ID de certificado.');
+                return;
+            }
+            
+            try {
+                const botaoVerificar = document.querySelector('button');
+                const textoOriginal = botaoVerificar.textContent;
+                botaoVerificar.innerHTML = 'Verificando... <span class="loading" style="width: 12px; height: 12px;"></span>';
+                
+                const response = await fetch(`${API_BASE}/certificates/certificate/${certId}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Certificado não encontrado');
+                    } else {
+                        throw new Error(`Erro ao buscar certificado: ${response.statusText}`);
+                    }
+                }
+                
+                const certificado = await response.json();
+                console.log('📋 Certificado retornado:', certificado);
+                
+                resultado.className = 'certificate-info valid';
+                resultadoIcon.innerHTML = '✅';
+                resultadoTexto.innerHTML = `Certificado <strong>VÁLIDO</strong> verificado com sucesso!`;
+                
+                detalhesCert.innerHTML = `
+                    <p><span>Nome:</span> ${certificado.participant_name || 'Não informado'}</p>
+                    <p><span>Curso:</span> ${certificado.course_name || 'Não informado'}</p>
+                    <p><span>Data de conclusão:</span> ${formatarData(certificado.completion_date) || 'Não informada'}</p>
+                    <p><span>Carga horária:</span> ${certificado.hours || '0'} horas</p>
+                    <p><span>Modalidade:</span> ${certificado.modalidade || 'Não informada'}</p>
+                    <p><span>Organização:</span> ${certificado.organizacao || 'Não informada'}</p>
+                    <p><span>Instrutor:</span> ${certificado.instrutor || 'Não informado'}</p>
+                    <p><span>Diretor:</span> ${certificado.diretor || 'Não informado'}</p>
+                    <div class="hash-code">Hash: ${certificado.hash_verificacao || 'Não informado'}</div>
+                `;
+                
+                botoesAcao.innerHTML = `
+                    <button onclick="baixarCertificado('${certId}')">Baixar PDF</button>
+                    <button onclick="visualizarCertificado('${certId}')" class="secondary">Visualizar</button>
+                `;
+                
+                resultado.style.display = 'block';
+                botaoVerificar.textContent = textoOriginal;
+                
+            } catch (error) {
+                console.error('❌ Erro na verificação:', error.message);
+                resultado.className = 'certificate-info invalid';
+                resultadoIcon.innerHTML = '❌';
+                resultadoTexto.innerHTML = `Erro: ${error.message}`;
+                detalhesCert.innerHTML = `<p>Verifique se o ID está correto e tente novamente.</p>`;
+                botoesAcao.innerHTML = '';
+                resultado.style.display = 'block';
+                
+                const botaoVerificar = document.querySelector('button');
+                botaoVerificar.textContent = 'Verificar';
+            }
+        }
+        
+        // Baixar certificado
+        async function baixarCertificado(certId) {
+            console.log('🔽 Tentando baixar PDF para:', certId);
+            try {
+                const botao = document.querySelector('#actionButtons button');
+                const textoOriginal = botao.textContent;
+                botao.innerHTML = 'Baixando... <span class="loading" style="width: 12px; height: 12px;"></span>';
+                
+                const response = await fetch(`${API_BASE}/certificates/generate/${certId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/pdf'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Falha ao baixar o PDF. Status: ${response.status}`);
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `certificado-${certId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                console.log('✅ Download concluído para:', certId);
+                setTimeout(() => {
+                    botao.textContent = textoOriginal;
+                }, 3001);
+                
+            } catch (error) {
+                console.error('❌ Erro ao baixar PDF:', error.message);
+                alert(`Erro ao baixar certificado: ${error.message}`);
+                const botao = document.querySelector('#actionButtons button');
+                botao.textContent = 'Baixar PDF';
+            }
+        }
+        
+        // Visualizar certificado
+        function visualizarCertificado(certId) {
+            console.log('👁️ Tentando visualizar PDF para:', certId);
+            window.open(`${API_BASE}/certificates/generate/${certId}`, '_blank');
+        }
+        
+        // Formatar data
+        function formatarData(dataString) {
+            if (!dataString) return 'Não informada';
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        }
+        
+        // Mostrar resultado
+        function mostrarResultado(tipo, mensagem) {
+            const resultado = document.getElementById('certificateResult');
+            const resultadoTexto = document.getElementById('resultText');
+            const resultadoIcon = document.getElementById('resultIcon');
+            const detalhesCert = document.getElementById('certDetails');
+            const botoesAcao = document.getElementById('actionButtons');
+            const placeholder = document.getElementById('placeholderText');
+            
+            placeholder.style.display = 'none';
+            resultado.className = 'certificate-info invalid';
+            
+            if (tipo === 'error') {
+                resultadoIcon.innerHTML = '❌';
+            } else {
+                resultadoIcon.innerHTML = '⚠️';
+            }
+            
+            resultadoTexto.innerHTML = mensagem;
+            detalhesCert.innerHTML = '';
+            botoesAcao.innerHTML = '';
+            resultado.style.display = 'block';
+        }
+        
+        // Permitir verificação ao pressionar Enter
+        document.getElementById('certificateId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarCertificado();
+            }
+        });
+        
+        // Verificar se há parâmetro na URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const certificateId = urlParams.get('certificate');
+            
+            if (certificateId) {
+                document.getElementById('certificateId').value = certificateId;
+                verificarCertificado();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar e Baixar Certificados - Red Innovations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fira Code', 'JetBrains Mono', 'Ubuntu Mono', 'DejaVu Sans Mono', monospace;
+        }
+        
+        body {
+            background-color: #0b0f14;
+            color: #e5e7eb;
+            line-height: 1.6;
+            padding: 20px;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #1f2937;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .logo:hover {
+            opacity: 0.8; /* Efeito de hover */
+        }
+        
+        .logo svg {
+            margin-right: 10px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+        
+        nav ul li a:hover {
+            color: #00ff88;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .terminal-window {
+            background-color: #0e141a;
+            border-radius: 14px;
+            border: 2px solid #1f2937;
+            overflow: hidden;
+            grid-column: 1 / -1;
+        }
+        
+        .terminal-header {
+            background-color: #111827;
+            padding: 12px 20px;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            margin-right: 15px;
+        }
+        
+        .terminal-button {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .button-close {
+            background-color: #ff5f56;
+        }
+        
+        .button-minimize {
+            background-color: #ffbd2e;
+        }
+        
+        .button-maximize {
+            background-color: #27c93f;
+        }
+        
+        .terminal-title {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+        
+        .terminal-body {
+            padding: 30px;
+        }
+        
+        .command-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .prompt {
+            color: #94a3b8;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        
+        .prompt-user {
+            color: #94a3b8;
+        }
+        
+        .prompt-at {
+            color: #e5e7eb;
+        }
+        
+        .prompt-host {
+            color: #94a3b8;
+        }
+        
+        .prompt-dir {
+            color: #e5e7eb;
+        }
+        
+        .prompt-symbol {
+            color: #00ff88;
+        }
+        
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            color: #e5e7eb;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            width: 100%;
+            outline: none;
+            caret-color: #00ff88;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+        
+        button {
+            background-color: #00ff88;
+            color: #0b0f14;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        
+        button:hover {
+            background-color: #00cc6a;
+        }
+        
+        button.secondary {
+            background-color: #4fd1c5;
+        }
+        
+        button.secondary:hover {
+            background-color: #38b2ac;
+        }
+        
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #0b1220;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
+        }
+        
+        .certificate-info {
+            display: none;
+        }
+        
+        .certificate-info.valid {
+            display: block;
+            color: #00ff88;
+        }
+        
+        .certificate-info.invalid {
+            display: block;
+            color: #ff5f56;
+        }
+        
+        .cert-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+        }
+        
+        .cert-details p {
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+        
+        .cert-details span {
+            color: #e5e7eb;
+        }
+        
+        .success-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .hash-code {
+            font-family: monospace;
+            background-color: #1a202c;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: #00ff88;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .admin-panel {
+            background-color: #0e141a;
+            border-radius: 14px;
+            border: 2px solid #1f2937;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .admin-panel h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #1f2937;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background-color: #111827;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #1f2937;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff88;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            nav ul li {
+                margin: 5px 10px;
+            }
+            
+            .terminal-body {
+                padding: 15px;
+            }
+            
+            .command-input {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            input[type="text"] {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+                margin-top: 10px;
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo" onclick="window.location.href='/'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Red Innovations
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="active">Home</a></li>
+                    <li><a href="/cursos">Cursos</a></li>
+                    <li><a href="/verificar">Verificação</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- HERO SECTION -->
+        <div class="hero">
+            <h1>Bem-vindo ao Curso de Linux</h1>
+            <p>Aprenda Linux do básico ao avançado e receba seu certificado oficial</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="window.location.href='/cursos'">Começar Agora</button>
+                <button class="btn btn-secondary" onclick="window.location.href='/verificar'">Verificar Certificado</button>
+            </div>
+        </div>
+
+        <!-- FEATURES SECTION -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🐧</div>
+                <h3>Linux Completo</h3>
+                <p>Do básico à administração avançada do sistema Linux</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📜</div>
+                <h3>Certificado Válido</h3>
+                <p>Certificado digital com código de verificação único</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Aprendizado Prático</h3>
+                <p>Aulas hands-on com exercícios e projetos reais</p>
+            </div>
+        </div>
+
+        <!-- QUICK VERIFICATION -->
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <div class="terminal-button button-close"></div>
+                    <div class="terminal-button button-minimize"></div>
+                    <div class="terminal-button button-maximize"></div>
+                </div>
+                <div class="terminal-title">user@linux: ~/verificar-certificado</div>
+            </div>
+            
+            <div class="terminal-body">
+                <div class="command-input">
+                    <div class="prompt">
+                        <span class="prompt-user">user@linux</span><span class="prompt-at">@</span>
+                        <span class="prompt-host">host</span><span class="prompt-dir">:~/verificar-certificado</span>
+                        <span class="prompt-symbol">$</span>
+                    </div>
+                    <input type="text" id="certificateId" placeholder=" Digite o ID do certificado" autofocus>
+                    <button onclick="verificarCertificado()">Verificar</button>
+                </div>
+                
+                <div style="margin-top: 20px; color: #94a3b8;">
+                    <span class="prompt-symbol">[DICA]</span> 
+                    Verifique rapidamente seu certificado ou 
+                    <a href="/verificar" style="color: #00ff88; text-decoration: none;">acesse a verificação completa</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS SECTION -->
+        <div class="stats-section">
+            <h2>Nossos Números</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCertificates">0</div>
+                    <div class="stat-label">Certificados Emitidos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalStudents">0</div>
+                    <div class="stat-label">Alunos Certificados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Satisfação</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Red Innovations &copy; 2025 - Especialistas em Educação Tecnológica</p>
+            <p>Curso de Linux - 20 horas - Modalidade Online - Instrutor: José Moraes</p>
+        </footer>
+    </div>
+
+    <script>
+        // URL base da API
+        const API_BASE = 'http://localhost:3001/api';
+        
+        // Função para carregar estatísticas
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/certificates/stats`);
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalCertificates').textContent = stats.total;
+                    document.getElementById('totalStudents').textContent = stats.valid;
+                }
+            } catch (error) {
+                console.log('Modo offline - usando estatísticas locais');
+                document.getElementById('totalCertificates').textContent = '15';
+                document.getElementById('totalStudents').textContent = '12';
+            }
+        }
+
+        // Função de verificação (igual à da página de verificação)
+        async function verificarCertificado() {
+            const certId = document.getElementById('certificateId').value.trim().toUpperCase();
+            
+            if (!certId) {
+                alert('Por favor, digite um ID de certificado.');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/certificates/${certId}`);
+                
+                if (response.ok) {
+                    alert('✅ Certificado válido! Redirecionando para verificação...');
+                    window.location.href = `/verificar?certificate=${certId}`;
+                } else {
+                    alert('❌ Certificado não encontrado');
+                }
+            } catch (error) {
+                alert('Erro ao verificar certificado');
+            }
+        }
+
+        // Carregar estatísticas ao iniciar
+        loadStats();
+
+        // Verificar certificado ao pressionar Enter
+        document.getElementById('certificateId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarCertificado();
+            }
+        });
+    </script>
+
+    <style>
+        /* ESTILOS ADICIONAIS PARA A HOME */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: #00ff88;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: #0e141a;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .stats-section h2 {
+            color: #00ff88;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: #0e141a;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-buttons .btn {
+                width: 200px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>

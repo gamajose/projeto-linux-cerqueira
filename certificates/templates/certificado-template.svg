@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000">
+  <defs>
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00ff88" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#00ff88" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#00ff88" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0 H0 V20" fill="none" stroke="#0f172a" stroke-opacity="0.35" stroke-width="1"/>
+    </pattern>
+    <style>
+      .mono { font-family: "Fira Code","JetBrains Mono","Ubuntu Mono","DejaVu Sans Mono",monospace; }
+      .soft { fill: #94a3b8; }
+      .green { fill: #00ff88; }
+      .cyan { fill: #4fd1c5; }
+      .yellow { fill: #fbbf24; }
+      .muted { fill: #9ca3af; }
+      .white { fill: #e5e7eb; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1400" height="1000" fill="#0b0f14"/>
+  <rect x="0" y="0" width="1400" height="1000" fill="url(#grid)" opacity="0.25"/>
+  <rect x="0" y="0" width="1400" height="1000" fill="url(#scan)"/>
+
+  <!-- Terminal window -->
+  <g transform="translate(80,90)">
+    <rect x="0" y="0" rx="14" ry="14" width="1240" height="820" fill="#0e141a" stroke="#1f2937" stroke-width="2"/>
+    <!-- Topbar -->
+    <rect x="0" y="0" rx="14" ry="14" width="1240" height="44" fill="#111827"/>
+    <circle cx="26" cy="22" r="7" fill="#ff5f56"/>
+    <circle cx="48" cy="22" r="7" fill="#ffbd2e"/>
+    <circle cx="70" cy="22" r="7" fill="#27c93f"/>
+    <text x="100" y="28" class="mono soft" font-size="18">user@linux: ~/certificados</text>
+
+    <!-- Content -->
+    <g transform="translate(40,80)">
+      <!-- Prompt line -->
+      <text x="0" y="0" class="mono" font-size="24">
+        <tspan class="soft">user@linux</tspan><tspan class="white">@</tspan><tspan class="soft">host</tspan><tspan class="white">:~</tspan><tspan class="green">$</tspan>
+        <tspan class="white"> echo </tspan><tspan class="yellow">"Certificado de Conclusão"</tspan>
+      </text>
+
+      <!-- Big title -->
+      <text x="0" y="70" class="mono green" font-size="52" font-weight="700" letter-spacing="1">CERTIFICADO</text>
+      <rect x="0" y="82" width="260" height="4" fill="#00ff88"/>
+
+      <!-- Participant -->
+      <text x="0" y="150" class="mono muted" font-size="20">Conferimos a(o):</text>
+      <text x="0" y="190" class="mono white" font-size="40" font-weight="600">{{NOME_DO_PARTICIPANTE}}</text>
+
+      <!-- Course -->
+      <text x="0" y="240" class="mono muted" font-size="20">Pela conclusão do curso:</text>
+      <text x="0" y="280" class="mono cyan" font-size="32" font-weight="600">Curso de Linux</text>
+
+      <!-- Details -->
+      <text x="0" y="330" class="mono soft" font-size="18">
+        <tspan class="white">Carga horária:</tspan> 20h • 
+        <tspan class="white">Data:</tspan> 01/10/2025 • 
+        <tspan class="white">Modalidade:</tspan> Online
+      </text>
+
+      <!-- Decorative "log" block -->
+      <rect x="0" y="360" width="760" height="1" fill="#1f2937"/>
+      <text x="0" y="390" class="mono soft" font-size="16">
+        <tspan class="green">[OK]</tspan> ./verifica_certificado --id LINUX2025-001 
+      </text>
+      <text x="0" y="415" class="mono soft" font-size="16">
+        <tspan class="green">[OK]</tspan> assinatura digital válida • hash: a7b9c3d2e1f4
+      </text>
+
+      <!-- Signatures -->
+      <g transform="translate(0,510)">
+        <rect x="0" y="0" width="760" height="1" fill="#1f2937"/>
+        <g transform="translate(0,30)">
+          <rect x="0" y="40" width="300" height="1" fill="#334155"/>
+          <text x="0" y="30" class="mono soft" font-size="16">Assinatura do(a) Instrutor(a)</text>
+          <text x="0" y="60" class="mono white" font-size="18">José Moraes</text>
+        </g>
+        <g transform="translate(420,30)">
+          <rect x="0" y="40" width="300" height="1" fill="#334155"/>
+          <text x="0" y="30" class="mono soft" font-size="16">Assinatura / Organização</text>
+          <text x="0" y="60" class="mono white" font-size="18">Red Innovations</text>
+        </g>
+      </g>
+
+      <!-- Right column: QR / verify -->
+      <g transform="translate(870,0)">
+        <rect x="0" y="0" width="280" height="280" rx="8" ry="8" fill="#0b1220" stroke="#1f2937"/>
+        <rect x="24" y="24" width="232" height="232" fill="#0e141a" stroke="#334155"/>
+        <text x="140" y="130" class="mono green" font-size="24" text-anchor="middle">QR CODE</text>
+        <text x="140" y="150" class="mono soft" font-size="14" text-anchor="middle">LINUX2025-001</text>
+        <text x="0" y="320" class="mono soft" font-size="16">Verificação:</text>
+        <text x="0" y="345" class="mono white" font-size="14">redinnovations.com/verify/LINUX2025-001</text>
+        <text x="0" y="375" class="mono soft" font-size="12">Substitua por QR code real para verificação online.</text>
+      </g>
+
+      <!-- Footer prompt -->
+      <text x="0" y="760" class="mono soft" font-size="16">
+        <tspan class="soft">user@linux</tspan><tspan class="white">@</tspan><tspan class="soft">host</tspan><tspan class="white">:~/certificados</tspan><tspan class="green">$</tspan>
+        <tspan class="white"> printf "</tspan><tspan class="yellow">Parabéns, {{NOME_DO_PARTICIPANTE}}!</tspan><tspan class="white">"</tspan>
+      </text>
+    </g>
+  </g>
+</svg>
